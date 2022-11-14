@@ -15,7 +15,7 @@ tasks:
         python setup.py install
       )
       
-github:
+ github:
   prebuilds:
     # enable for the master/default branch (defaults to true)
     master: true
