@@ -12,10 +12,10 @@ tasks:
         sudo pip3 install paho-mqtt
         git clone https://github.com/eclipse/paho.mqtt.python.git
         cd paho.mqtt.python
-        python setup.py install
-      )
-      
- github:
+        python setup.py install
+      )
+
+github:
   prebuilds:
     # enable for the master/default branch (defaults to true)
     master: true
