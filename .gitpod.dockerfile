@@ -15,5 +15,5 @@ RUN sudo apt-get update \
     paho-mqtt \
     git clone https://github.com/eclipse/paho.mqtt.python.git \
     cd paho.mqtt.python \
-python setup.py install \
+    python setup.py install \
  && sudo rm -rf /var/lib/apt/lists/*
