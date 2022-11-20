@@ -17,6 +17,13 @@ tasks:
         sudo apt-get install libasound-dev portaudio19-dev libportaudio2 libportaudiocpp0
         sudo apt-get install ffmpeg libav-tools
         sudo pip install pyaudio
+        
+        #extensions for python code
+        sudo apt-get install python3-matplotlib
+        sudo apt install python3-pip
+        sudo apt install python3-numpy
+        sudo apt-get install python3-scipy
+        
       )
 
 github:
