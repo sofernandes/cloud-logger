@@ -1,14 +1,9 @@
 import time  # to simulate a real time data, time loop
-from streamlit_autorefresh import st_autorefresh
-
 import numpy as np  # np mean, np random
 import pandas as pd  # read csv, df manipulation
 import streamlit as st  # 🎈 data web app development
 import matplotlib.pyplot as plt
 from pathlib import Path 
-from scipy.fft import rfft, rfftfreq
-import math
-import librosa 
 from scipy.signal import butter, lfilter
 
 def butter_bandpass(lowcut, highcut, fs, order=5):
