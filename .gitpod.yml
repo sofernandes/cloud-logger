@@ -20,9 +20,6 @@ tasks:
         
         #extensions for python code
         sudo apt-get install python3-matplotlib
-        sudo apt install python3-pip
-        sudo apt install python3-numpy
-        sudo apt-get install python3-scipy
         
       )
 
