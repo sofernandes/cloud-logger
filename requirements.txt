@@ -1,0 +1,10 @@
+streamlit
+pandas
+numpy
+librosa
+librosa.display
+sklearn
+matplotlib
+time
+pathlib
+scipy
