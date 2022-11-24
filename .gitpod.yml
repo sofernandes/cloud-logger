@@ -18,7 +18,7 @@ tasks:
         sudo apt install build-essential portaudio19-dev python3.10-dev
         sudo apt-get install libasound-dev portaudio19-dev libportaudio2 libportaudiocpp0
         sudo apt-get install ffmpeg libav-tools
-        sudo pip install pyaudio
+        pip install pyaudio
         
         #extensions for python code
         pip3 install -r requirements.txt
