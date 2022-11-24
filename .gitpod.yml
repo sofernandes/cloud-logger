@@ -19,7 +19,8 @@ tasks:
         sudo pip install pyaudio
         
         #extensions for python code
-        sudo apt-get install python3-matplotlib
+        pip3 install -r requirements.txt
+    command: python3 main.py
         
       )
 
