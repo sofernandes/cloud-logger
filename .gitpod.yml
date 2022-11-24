@@ -20,8 +20,6 @@ tasks:
         
         #extensions for python code
         pip3 install -r requirements.txt
-    command: python3 streamlit run app.py
-        
       )
 
 github:
