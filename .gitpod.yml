@@ -20,6 +20,8 @@ tasks:
         
         #extensions for python code
         pip3 install -r requirements.txt
+        sudo pip install --upgrade librosa
+        sudo pip install --upgrade matplotlib
       )
 
 github:
