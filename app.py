@@ -4,38 +4,64 @@ import pandas as pd  # read csv, df manipulation
 import streamlit as st  # 🎈 data web app development
 import matplotlib.pyplot as plt
 from pathlib import Path 
-from scipy.signal import butter, lfilter
+from scipy.signal import butter, lfilter, spectrogram
 import paho.mqtt.client as mqtt 
 import librosa
 import librosa.display
+import sklearn
+from numpy.fft import fft
 
-def butter_bandpass(lowcut, highcut, fs, order=5):
-    return butter(order, [lowcut, highcut], fs=fs, btype='band')
 
 def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
-    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+    b, a = butter(order, [lowcut, highcut], fs=fs, btype='band')
     y = lfilter(b, a, data)
     return y
 
 
-def plot_senogram(data, lowcut, highcut):
+def plot_senogram(y):
+    fig, ax = plt.subplots(figsize=(14, 4)) 
     st.write('Sonogram plot')
     ax.set_xlabel("Time /s")
     ax.set_ylabel("Data")
-    fs = 44100
-    y = butter_bandpass_filter(data, lowcut, highcut, fs)
+    ax.set_title("Sonogram plot", fontsize = 15)
     ax.plot(y)
     plt.show()
     st.pyplot(fig) 
 
 
-def plot_espetrogram(y, sr):
-    fig, ax = plt.subplots(figsize=(14,5)) 
-    st.write("Espetrograma")
-    X = librosa.stft(y)
-    Xdb = librosa.amplitude_to_db(abs(X))
-    librosa.display.specshow(Xdb, sr=sr, x_axis='time', y_axis='hz')
-    plt.colorbar()
+def plot_fft(y, fs):
+    st.write('Frequency Domain plot')
+    #plot FFT
+    X = fft(y)
+    N = len(X)
+    n = np.arange(N)
+    T = N/fs
+    freq = n/T 
+    # Get the one-sided specturm
+    n_oneside = N//2
+    # get the one side frequency
+    f_oneside = freq[:n_oneside]
+    
+    fig, ax = plt.subplots(figsize=(14, 4)) 
+    plt.plot(f_oneside, np.abs(X[:n_oneside]), 'b')
+    plt.xlabel('Freq /Hz')
+    plt.ylabel('FFT Amplitude')
+    ax.set_title("Fourier transform plot", fontsize = 15)
+    plt.show()
+    st.pyplot(fig)
+    
+def plot_spetrogram(y,fs):
+    st.write('Spectrogram plot')
+    fig, ax = plt.subplots(1, figsize=(14, 8))
+    fig.tight_layout(pad=10.0)
+    ax.specgram(y, Fs=fs)
+    ax.set_xlabel(xlabel='Time /sec')
+    ax.set_ylabel(ylabel='Frequency Amplitude / rad/s')
+    helper = [0, 2500, 5000, 7500, 10000, 12500, 15000, 17500, 20000]
+    spec_yticks = [6.28 * i for i in helper]
+    ax.set_yticks(helper)
+    ax.set_yticklabels(spec_yticks)
+    ax.set_title("Signal Spectrogram", fontsize = 15)
     st.pyplot(fig)
 
 
@@ -53,7 +79,7 @@ def publish_status():
 mqttBroker ="test.mosquitto.org" 
 client = mqtt.Client("soundcloud")
 client.connect(mqttBroker, port=1883) 
-RATE = 44100
+fs = 44100
 
 #read txt from a URL
 def get_data():
@@ -137,54 +163,42 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         #get filter parameters
         my_expander = st.expander('Band Pass filter')
         my_expander.write('Choose low-cut and high-cut frequencies:')
-        lowcut = my_expander.slider("Low-cut frequency", 0.01, 255049.9, 0.01)
+        lowcut = my_expander.slider("Low-cut frequency", 0.01, 22049.9, 0.01)
         highcut = my_expander.slider("High-cut frequency", 0.01, 22049.9, 22049.9)
         
     
         #choose what to plot, by default it plots sonogram
-        show = st.multiselect("Select plot", ['Sonogram','Time Domain','Frequency Domain'], ['Sonogram'])
-        
-        width = st.sidebar.slider("Plot width", 1, 20, 15)
-        height = st.sidebar.slider("Plot height", 1, 10, 5)
-        
-  
-        fig, ax = plt.subplots(figsize=(width, height)) 
-        plt.subplots(figsize=(width, height)) 
+        show = st.multiselect("Select plot", ['Sonogram','Spectrogram','Frequency Domain'], ['Sonogram'])
+
+        y = butter_bandpass_filter(st.session_state['data']['data'], lowcut, highcut, fs)
         
         if len(show) == 1:
             if show[0] == 'Sonogram':
-                 plot_senogram(st.session_state['data'], lowcut, highcut)
+                 plot_senogram(y)
             
-            if show[0] == 'Time Domain':
-                st.write('Time Domain plot')
+            if show[0] == 'Spectrogram':
+                plot_spetrogram(y, fs)
                 
             if show[0] == 'Frequency Domain':
-                st.write('Frequency Domain plot')
-        
+                plot_fft(y, fs)
         
         if len(show) == 2:
-            if 'Sonogram' in show and 'Time Domain' in show:
-                 plot_senogram(st.session_state['data'], lowcut, highcut)
-                 
-                 st.write('Time Domain plot')
+            if 'Sonogram' in show and 'Spectrogram' in show:
+                 plot_senogram(y)
+                 plot_spetrogram(y, fs)
                  
             if 'Sonogram' in show and 'Frequency Domain' in show:
-                plot_senogram(st.session_state['data'], lowcut, highcut)
-                  
-                st.write('Frequency Domain plot')     
+                plot_senogram(y)
+                plot_fft(y, fs)   
                 
-            if 'Time Domain' in show and 'Frequency Domain' in show:
-                st.write('Time Domain plot')
-                   
-                st.write('Frequency Domain plot')     
-      
+            if 'Spectrogram' in show and 'Frequency Domain' in show:
+                plot_spetrogram(y, fs)
+                plot_fft(y, fs)   
             
         if len(show) == 3:
-            plot_senogram(st.session_state['data'], lowcut, highcut)
-            
-            st.write('Time Domain plot')
-             
-            st.write('Frequency Domain plot')
+            plot_senogram(y)
+            plot_fft(y, fs) 
+            plot_spetrogram(y, fs)
 
         
     
@@ -213,7 +227,6 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         
         #zero-crossing rate
         
-        import sklearn
 
         spectral_centroids = librosa.feature.spectral_centroid(y, sr=fs)[0]
       #  spectral_centroids.shape
@@ -235,29 +248,20 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         
         st.subheader('Time-frequency domain')
 
-        #spectrogram
-        st.write("Espetrograma")
-        X = librosa.stft(y)
-        Xdb = librosa.amplitude_to_db(abs(X))
-        fig, ax = plt.subplots(figsize=(14, 5))
-        img = librosa.display.specshow(Xdb, sr=fs, x_axis='time', y_axis='hz')
-        plt.colorbar(img, ax= ax)
-        st.pyplot(fig)
-        
         #Spectral centroid
         st.write("Spectral Centroid")
-        fig2, ax = plt.subplots(figsize=(14,5)) 
-        img = librosa.display.specshow(Xdb, sr=fs, x_axis='time', y_axis='log', ax=ax)
-        plt.colorbar(img, ax = ax)
-        st.pyplot(fig2)
+        #fig2, ax = plt.subplots(figsize=(14,5)) 
+        #img = librosa.display.specshow(Xdb, sr=fs, x_axis='time', y_axis='log', ax=ax)
+        #plt.colorbar(img, ax = ax)
+        #st.pyplot(fig2)
     
         #chromagram
-        chroma = librosa.feature.chroma_cqt(y=y, sr=fs)
-        fig, ax = plt.subplots()
-        img = librosa.display.specshow(chroma, y_axis='chroma', x_axis='time', ax=ax)
-        ax.set(title='Chromagram demonstration')
-        fig.colorbar(img, ax=ax)
-        st.pyplot(fig)
+        #chroma = librosa.feature.chroma_cqt(y=y, sr=fs)
+        #fig, ax = plt.subplots()
+        #img = librosa.display.specshow(chroma, y_axis='chroma', x_axis='time', ax=ax)
+        #ax.set(title='Chromagram demonstration')
+        #fig.colorbar(img, ax=ax)
+        #st.pyplot(fig)
                     
 else:
     st.write("Please generate a new file")
