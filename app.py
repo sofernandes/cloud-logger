@@ -5,6 +5,9 @@ import streamlit as st  # 🎈 data web app development
 import matplotlib.pyplot as plt
 from pathlib import Path 
 from scipy.signal import butter, lfilter
+import paho.mqtt.client as mqtt 
+import librosa
+import librosa.display
 
 def butter_bandpass(lowcut, highcut, fs, order=5):
     return butter(order, [lowcut, highcut], fs=fs, btype='band')
@@ -25,16 +28,36 @@ def plot_senogram(data, lowcut, highcut):
     plt.show()
     st.pyplot(fig) 
 
+
+def plot_espetrogram(y, sr):
+    fig, ax = plt.subplots(figsize=(14,5)) 
+    st.write("Espetrograma")
+    X = librosa.stft(y)
+    Xdb = librosa.amplitude_to_db(abs(X))
+    librosa.display.specshow(Xdb, sr=sr, x_axis='time', y_axis='hz')
+    plt.colorbar()
+    st.pyplot(fig)
+
+
 st.set_page_config(
  page_title='Audio Visualization',
  layout="centered",
  initial_sidebar_state="auto",
 )
 
+def publish_status():
+    client.publish("Status", st.session_state["start"])
+ 
+    
+ 
+mqttBroker ="test.mosquitto.org" 
+client = mqtt.Client("soundcloud")
+client.connect(mqttBroker, port=1883) 
+RATE = 44100
 
-#read csv from a URL
+#read txt from a URL
 def get_data():
-    with open("dados.txt","r") as f:
+    with open("dadosSOM.txt","r") as f:
         last_line = f.readlines()[-1]
         return float(last_line[:-1])
 
@@ -43,6 +66,7 @@ st.markdown("#### Microphone aquisition Cloud Logger")
 start = st.button("Start Aquisition")
 if start:
     st.session_state['start'] = True
+    publish_status()    
 
 my_file = Path("dados.txt")
 if my_file.is_file() and 'start' in st.session_state: #if file exists
@@ -57,6 +81,7 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
     with col2:
         if st.button('Stop'):
             st.session_state['start'] = False
+            publish_status()
     with col3:
         rst = st.button('Reset')
     with col4:
@@ -94,8 +119,8 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
                 
                 df = df.append(point,ignore_index = True)
                 
-                time.sleep(0.1)
-                seconds += 0.1
+                time.sleep(1/RATE)
+                seconds += 1/RATE
         
                 st.session_state['data'] = df
         else:
@@ -112,8 +137,8 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         #get filter parameters
         my_expander = st.expander('Band Pass filter')
         my_expander.write('Choose low-cut and high-cut frequencies:')
-        lowcut = my_expander.slider("Low-cut frequency", 0.01, 20000.0, 0.01)
-        highcut = my_expander.slider("High-cut frequency", 0.01, 20000.0, 20000.0)
+        lowcut = my_expander.slider("Low-cut frequency", 0.01, 255049.9, 0.01)
+        highcut = my_expander.slider("High-cut frequency", 0.01, 22049.9, 22049.9)
         
     
         #choose what to plot, by default it plots sonogram
@@ -164,23 +189,75 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         
     
     if radio == "Features" and 'start' in st.session_state:
+        y = st.session_state['data']['data'].to_numpy()
+        fs = 44100
+        
         st.header("Feature extraction")
         st.subheader("Time domain")
         #amplitude envelope
+        y_harmonic, y_percussive = librosa.effects.hpss(y)
+        st.write("Componente harmónica")
+        fig, ax = plt.subplots(figsize=(14, 4)) 
+        ax.set_xlabel("Time /s")
+        ax.set_ylabel("Amplitude")
+        ax.plot(y_harmonic)
+        st.pyplot(fig)
         
+        st.write("Componente Percurssiva")
+        fig, ax = plt.subplots(figsize=(14, 4)) 
+        ax.set_xlabel("Time /s")
+        ax.set_ylabel("Amplitude")
+        ax.plot(y_percussive)
+        st.pyplot(fig)
         #root mean square energy
         
         #zero-crossing rate
         
+        import sklearn
+
+        spectral_centroids = librosa.feature.spectral_centroid(y, sr=fs)[0]
+      #  spectral_centroids.shape
+     #   (775,)
+        # Computing the time variable for visualization
+        fig, ax = plt.subplots(figsize=(14, 4)) 
+        frames = range(len(spectral_centroids))
+        t = librosa.frames_to_time(frames)
+        # Normalising the spectral centroid for visualisation
+        def normalize(y, axis=0):
+            return sklearn.preprocessing.minmax_scale(y, axis=axis)
+        #Plotting the Spectral Centroid along the waveform
+        librosa.display.waveshow(y, sr=fs, alpha=0.4)
+        ax.plot(t, normalize(spectral_centroids), color='b')
+        st.pyplot(fig)
+        
+        
         st.subheader('Frequency domain')
         
         st.subheader('Time-frequency domain')
+
         #spectrogram
+        st.write("Espetrograma")
+        X = librosa.stft(y)
+        Xdb = librosa.amplitude_to_db(abs(X))
+        fig, ax = plt.subplots(figsize=(14, 5))
+        img = librosa.display.specshow(Xdb, sr=fs, x_axis='time', y_axis='hz')
+        plt.colorbar(img, ax= ax)
+        st.pyplot(fig)
         
         #Spectral centroid
-     
-        #chroma energy
+        st.write("Spectral Centroid")
+        fig2, ax = plt.subplots(figsize=(14,5)) 
+        img = librosa.display.specshow(Xdb, sr=fs, x_axis='time', y_axis='log', ax=ax)
+        plt.colorbar(img, ax = ax)
+        st.pyplot(fig2)
     
-    
+        #chromagram
+        chroma = librosa.feature.chroma_cqt(y=y, sr=fs)
+        fig, ax = plt.subplots()
+        img = librosa.display.specshow(chroma, y_axis='chroma', x_axis='time', ax=ax)
+        ax.set(title='Chromagram demonstration')
+        fig.colorbar(img, ax=ax)
+        st.pyplot(fig)
+                    
 else:
     st.write("Please generate a new file")
