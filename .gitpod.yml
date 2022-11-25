@@ -31,7 +31,7 @@ tasks:
         gp sync-done installation
       )
   - init: gp sync-await installation
-    command: streamlit run webpage.py
+    command: streamlit run app.py
   - init: gp sync-await installation
     command: python subscriberSOM.py
     
