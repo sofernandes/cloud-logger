@@ -26,7 +26,25 @@ tasks:
         pip3 install -r requirements.txt
         sudo pip install --upgrade librosa
         sudo pip install --upgrade matplotlib
+      
+        #Wait for the installation to be completed
+        gp sync-done installation
       )
+  - init: gp sync-await installation
+    command: streamlit run webpage.py
+  - init: gp sync-await installation
+    command: python subscriberSOM.py
+    
+# List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
+ports:
+  #default port?
+  - port: 1883
+    onOpen: ignore
+  - port: 8501
+    name: web page
+    description: Computer Microphone data logger
+    onOpen: open-browser
+    visibility: public
 
 github:
   prebuilds:
