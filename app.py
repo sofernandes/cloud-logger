@@ -127,8 +127,9 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
     
     with st.sidebar:
         st.write('___')
-        csv = st.session_state['data'].to_csv(index=False).encode('utf-8')
-        save = st.download_button( label="Download", data = csv, file_name="dataSOM.csv"  )
+        if 'data' in st.session_state:    
+            csv = st.session_state['data'].to_csv(index=False).encode('utf-8')
+            save = st.download_button( label="Download", data = csv, file_name="dataSOM.csv"  )
 
     if rst: 
         del st.session_state['data']
