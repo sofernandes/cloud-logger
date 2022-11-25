@@ -116,6 +116,7 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         if st.button('Stop'):
             st.session_state['start'] = False
             publish_status()
+            
     with col2:
         rst = st.button('Reset')
 
@@ -124,13 +125,6 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
 
     radio = st.sidebar.radio("Choose method",("Real-time Plot", "Data visualization","Features"))
         
-    
-    with st.sidebar:
-        st.write('___')
-        if 'data' in st.session_state:    
-            csv = st.session_state['data'].to_csv(index=False).encode('utf-8')
-        
-        save = st.download_button( label="Download", data = csv, file_name="dataSOM.csv"  )
 
     if rst: 
         del st.session_state['data']
@@ -170,6 +164,12 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         else:
             st.line_chart(st.session_state['data'])
             
+        with st.sidebar:
+            st.write('___')
+            if 'data' in st.session_state:    
+                csv = st.session_state['data'].to_csv(index=False).encode('utf-8')
+            
+            save = st.download_button( label="Download", data = csv, file_name="dataSOM.csv"  )
         
         is_check = st.checkbox("Display Data")
         if is_check:
