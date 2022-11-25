@@ -84,7 +84,7 @@ fs = 44100
 #read txt from a URL
 def get_data():
     with open("/workspace/cloud-logger/dadosSOM.txt","r") as f:
-    #with open("dadosSOM.txt","r") as f:
+ #   with open("dadosSOM.txt","r") as f:
         last_line = f.readlines()[-1]
         return float(last_line[:-1])
 
@@ -97,6 +97,8 @@ if start:
     st.session_state['start'] = True
     publish_status()    
 
+     
+   
 
 
 my_file = Path("/workspace/cloud-logger/dadosSOM.txt")
@@ -110,8 +112,18 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
             st.error("Stopped")  
         st.write('___')
 
+    
 
-
+    col1,col11, col12, col13, col14, col2 = st.columns(6)
+        
+    with col1:
+        if st.button('Stop'):
+            st.session_state['start'] = False
+            publish_status()
+            
+    with col2:
+        rst = st.button('Reset')
+      
     radio = st.sidebar.radio("Choose method",("Real-time Plot", "Data visualization","Features"))
 
         
@@ -136,37 +148,28 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         else:
             st.line_chart(st.session_state['data'])
             
-            
-            
-        col1,col11, col12, col13, col14, col2 = st.columns(6)
-            
-        with col1:
-            if st.button('Stop'):
-                st.session_state['start'] = False
-                publish_status()
-                
-        with col2:
-            rst = st.button('Reset')
+        
+        if rst:
             del st.session_state['data']
             del st.session_state['start']
             st.warning("Data was deleted!")
-           # seconds = 0
+        
 
         with st.sidebar:
             st.write('___')
             if 'data' in st.session_state:    
                 csv = st.session_state['data'].to_csv(index=False).encode('utf-8')
             
-            save = st.download_button( label="Download", data = csv, file_name="dataSOM.csv"  )
-            if save:
-                if 'data' not in st.session_state:
-                    st.write("Please generate data")
-                else:
-                    with st.sidebar:
-                        with st.spinner('Saving...'):
-                                time.sleep(0.5)
-                                
-                                st.success("Done!")
+                save = st.download_button( label="Download", data = csv, file_name="dataSOM.csv"  )
+                if save:
+                    if 'data' not in st.session_state:
+                        st.write("Please generate data")
+                    else:
+                        with st.sidebar:
+                            with st.spinner('Saving...'):
+                                    time.sleep(0.5)
+                                    
+                                    st.success("Done!")
             
         
         is_check = st.checkbox("Display Data")
