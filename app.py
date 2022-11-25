@@ -145,8 +145,8 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
                 
                 df = df.append(point,ignore_index = True)
                 
-                time.sleep(0.001)
-                seconds += 0.001
+                time.sleep(0.01)
+                seconds += 0.01
         
                 st.session_state['data'] = df
         else:
