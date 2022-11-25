@@ -16,6 +16,7 @@ tasks:
         python setup.py install
         #To install pyAudio
         sudo apt-get install libsndfile-dev
+        sudo apt-get install libsndfile1-dev
         sudo apt install build-essential portaudio19-dev python3.10-dev
         sudo apt-get install libasound-dev portaudio19-dev libportaudio2 libportaudiocpp0
         sudo apt-get install ffmpeg libav-tools
