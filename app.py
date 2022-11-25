@@ -94,7 +94,7 @@ if start:
     st.session_state['start'] = True
     publish_status()    
 
-my_file = Path("dados.txt")
+my_file = Path("/workspace/cloud-logger/dadosSOM.txt")
 if my_file.is_file() and 'start' in st.session_state: #if file exists
     
     with st.sidebar:
