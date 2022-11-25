@@ -109,24 +109,24 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
             st.session_state['start'] = False
             publish_status()
     with col3:
-        rst = st.button('Reset')
-    with col4:
-        dwl = st.button('Download File')
-
-    radio = st.sidebar.radio("Choose method",("Real-time Plot", "Data visualization","Features"))
-        
-
-    if rst: 
+        st.button('Reset')
         del st.session_state['data']
         del st.session_state['start']
        # seconds = 0
-    
-    if dwl:
-        with st.spinner('Saving...'):
-                time.sleep(0.5)
-                np.savetxt(r'C:/Users/Susana/Downloads/data.txt', st.session_state['data'].values, fmt='%f', delimiter='\t')
-                st.success("Done!")
         
+    with col4:
+         with st.spinner('Saving...'):
+                time.sleep(0.5)
+                
+                st.download_button(
+                    label="Download File",
+                    data= np.savetxt("dataSOM.txt", st.session_state['data'].values, fmt='%f', delimiter='\t'),
+                    file_name="dataSOM.txt",
+                    mime="text/plain"
+                )
+                st.success("Done!")
+
+    radio = st.sidebar.radio("Choose method",("Real-time Plot", "Data visualization","Features"))
         
     if radio == "Real-time Plot" and 'start' in st.session_state:
         # Initialization
@@ -145,8 +145,8 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
                 
                 df = df.append(point,ignore_index = True)
                 
-                time.sleep(0.01)
-                seconds += 0.01
+                time.sleep(0.1)
+                seconds += 0.1
         
                 st.session_state['data'] = df
         else:
