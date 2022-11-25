@@ -1,10 +1,10 @@
 import time  # to simulate a real time data, time loop
 import numpy as np  # np mean, np random
 import pandas as pd  # read csv, df manipulation
-import streamlit as st  # 🎈 data web app development
+import streamlit as st  # data web app development
 import matplotlib.pyplot as plt
 from pathlib import Path 
-from scipy.signal import butter, lfilter, spectrogram
+from scipy.signal import butter, lfilter
 import paho.mqtt.client as mqtt 
 import librosa
 import librosa.display
@@ -204,34 +204,43 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
     
     if radio == "Features" and 'start' in st.session_state:
         y = st.session_state['data']['data'].to_numpy()
-        fs = 44100
         
         st.header("Feature extraction")
-        st.subheader("Time domain")
-        #amplitude envelope
-        y_harmonic, y_percussive = librosa.effects.hpss(y)
-        st.write("Componente harmónica")
-        fig, ax = plt.subplots(figsize=(14, 4)) 
-        ax.set_xlabel("Time /s")
-        ax.set_ylabel("Amplitude")
-        ax.plot(y_harmonic)
-        st.pyplot(fig)
         
-        st.write("Componente Percurssiva")
-        fig, ax = plt.subplots(figsize=(14, 4)) 
-        ax.set_xlabel("Time /s")
-        ax.set_ylabel("Amplitude")
-        ax.plot(y_percussive)
-        st.pyplot(fig)
+        st.subheader("Time domain")
+        
+        col1, col2 = st.columns([1,1])
+        with col1:
+            #amplitude envelope
+            y_harmonic, y_percussive = librosa.effects.hpss(y)
+            st.write("Componente harmónica")
+            fig, ax = plt.subplots(figsize=(10, 6)) 
+            ax.set_xlabel("Time /s")
+            ax.set_ylabel("Amplitude")
+            ax.plot(y_harmonic)
+            st.pyplot(fig)
+        
+        with col2:
+            st.write("Componente Percurssiva")
+            fig, ax = plt.subplots(figsize=(10, 6)) 
+            ax.set_xlabel("Time /s")
+            ax.set_ylabel("Amplitude")
+            ax.plot(y_percussive)
+            st.pyplot(fig)
+        
         #root mean square energy
         
-        #zero-crossing rate
         
+        
+        #zero-crossing rate
+    
+        
+        
+        st.subheader('Time-frequency domain')
 
+        #spectral centroid
+        st.write("Spectral Centroid")
         spectral_centroids = librosa.feature.spectral_centroid(y, sr=fs)[0]
-      #  spectral_centroids.shape
-     #   (775,)
-        # Computing the time variable for visualization
         fig, ax = plt.subplots(figsize=(14, 4)) 
         frames = range(len(spectral_centroids))
         t = librosa.frames_to_time(frames)
@@ -242,26 +251,15 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         librosa.display.waveshow(y, sr=fs, alpha=0.4)
         ax.plot(t, normalize(spectral_centroids), color='b')
         st.pyplot(fig)
-        
-        
-        st.subheader('Frequency domain')
-        
-        st.subheader('Time-frequency domain')
-
-        #Spectral centroid
-        st.write("Spectral Centroid")
-        #fig2, ax = plt.subplots(figsize=(14,5)) 
-        #img = librosa.display.specshow(Xdb, sr=fs, x_axis='time', y_axis='log', ax=ax)
-        #plt.colorbar(img, ax = ax)
-        #st.pyplot(fig2)
     
         #chromagram
-        #chroma = librosa.feature.chroma_cqt(y=y, sr=fs)
-        #fig, ax = plt.subplots()
-        #img = librosa.display.specshow(chroma, y_axis='chroma', x_axis='time', ax=ax)
-        #ax.set(title='Chromagram demonstration')
-        #fig.colorbar(img, ax=ax)
-        #st.pyplot(fig)
+        st.write("Chromagram")
+        chroma = librosa.feature.chroma_cqt(y=y, sr=fs)
+        fig, ax = plt.subplots(figsize=(14, 4)) 
+        img = librosa.display.specshow(chroma, y_axis='chroma', x_axis='time', ax=ax)
+        ax.set(title='Chromagram')
+        fig.colorbar(img, ax=ax)
+        st.pyplot(fig)
                     
 else:
     st.write("Please generate a new file")
