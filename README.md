@@ -13,4 +13,4 @@ In the streamlit application the user will be able to acess:
 - Data visualization: Plots sonogram, frequency domain signal (FFT) and spectrogram. The signal can be filtered with desired low-cut and high-cut frequency and the result will be shown on said graphs.
 - Features: visualization of different features related to sound. 
 
-The arquitecture diagram is as follows:
+The architecture diagram is as follows:
