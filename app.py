@@ -110,29 +110,10 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
             st.error("Stopped")  
         st.write('___')
 
-    col1,col11, col12, col13, col14, col2 = st.columns(6)
-        
-    with col1:
-        if st.button('Stop'):
-            st.session_state['start'] = False
-            publish_status()
-            
-    with col2:
-        rst = st.button('Reset')
-
-
 
 
     radio = st.sidebar.radio("Choose method",("Real-time Plot", "Data visualization","Features"))
-        
 
-    if rst: 
-        del st.session_state['data']
-        del st.session_state['start']
-        st.warning("Data was deleted!")
-       # seconds = 0
-    
-  
         
     if radio == "Real-time Plot" and 'start' in st.session_state:
         # Initialization
@@ -155,6 +136,22 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         else:
             st.line_chart(st.session_state['data'])
             
+            
+            
+        col1,col11, col12, col13, col14, col2 = st.columns(6)
+            
+        with col1:
+            if st.button('Stop'):
+                st.session_state['start'] = False
+                publish_status()
+                
+        with col2:
+            rst = st.button('Reset')
+            del st.session_state['data']
+            del st.session_state['start']
+            st.warning("Data was deleted!")
+           # seconds = 0
+
         with st.sidebar:
             st.write('___')
             if 'data' in st.session_state:    
