@@ -132,16 +132,7 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         st.warning("Data was deleted!")
        # seconds = 0
     
-    if save:
-        if 'data' not in st.session_state:
-            st.write("Please generate data")
-        else:
-            with st.sidebar:
-                with st.spinner('Saving...'):
-                        time.sleep(0.5)
-                        
-                        st.success("Done!")
-            
+  
         
     if radio == "Real-time Plot" and 'start' in st.session_state:
         # Initialization
@@ -170,6 +161,16 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
                 csv = st.session_state['data'].to_csv(index=False).encode('utf-8')
             
             save = st.download_button( label="Download", data = csv, file_name="dataSOM.csv"  )
+            if save:
+                if 'data' not in st.session_state:
+                    st.write("Please generate data")
+                else:
+                    with st.sidebar:
+                        with st.spinner('Saving...'):
+                                time.sleep(0.5)
+                                
+                                st.success("Done!")
+            
         
         is_check = st.checkbox("Display Data")
         if is_check:
