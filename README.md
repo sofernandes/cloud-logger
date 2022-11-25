@@ -11,6 +11,6 @@ Data can be downloaded either by saving the "dataSOM.txt" file in Gitpod's direc
 In the streamlit application the user will be able to acess:
 - Real life plot of the acquired signal
 - Data visualization: Plots sonogram, frequency domain signal (FFT) and spectrogram. The signal can be filtered with desired low-cut and high-cut frequency and the result will be shown on said graphs.
-- Features: visualization of different features related to sound. 
+- Features: visualization of different features related to sound. Some examples of features are: chroma, zero crossing rate, etc.
 
 The architecture diagram is as follows:
