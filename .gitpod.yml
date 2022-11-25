@@ -6,7 +6,7 @@ tasks:
         sudo pip3 install streamlit
         #To install MQTT service
         sudo apt install -y mosquitto
-        sudo apt install mosquitto-clients
+        sudo apt install -y mosquitto-clients
         sudo service mosquitto start
         sudo service mosquitto status
         #To install Paho-MQTT
@@ -15,11 +15,11 @@ tasks:
         cd paho.mqtt.python
         python setup.py install
         #To install pyAudio
-        sudo apt-get install libsndfile-dev
-        sudo apt-get install libsndfile1-dev
+        sudo apt-get -y install libsndfile-dev
+        sudo apt-get -y install libsndfile1-dev
         sudo apt install build-essential portaudio19-dev python3.10-dev
-        sudo apt-get install libasound-dev portaudio19-dev libportaudio2 libportaudiocpp0
-        sudo apt-get install ffmpeg libav-tools
+        sudo apt-get -y install libasound-dev portaudio19-dev libportaudio2 libportaudiocpp0
+        sudo apt-get -y install ffmpeg libav-tools
         pip install pyaudio
         
         #extensions for python code
