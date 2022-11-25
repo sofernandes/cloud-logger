@@ -84,59 +84,75 @@ fs = 44100
 #read txt from a URL
 def get_data():
     with open("/workspace/cloud-logger/dadosSOM.txt","r") as f:
+    #with open("dadosSOM.txt","r") as f:
         last_line = f.readlines()[-1]
         return float(last_line[:-1])
 
-st.markdown("#### Microphone aquisition Cloud Logger")
+
+st.markdown("<h1 style='text-align: center; color: white; padding:20px'>Sound Aquisition Logger</h1>", unsafe_allow_html=True)
+st.write('___')
 
 start = st.button("Start Aquisition")
 if start:
     st.session_state['start'] = True
     publish_status()    
 
+
+
 my_file = Path("/workspace/cloud-logger/dadosSOM.txt")
+#my_file = Path("dadosSOM.txt")
 if my_file.is_file() and 'start' in st.session_state: #if file exists
     
     with st.sidebar:
         if 'start' in st.session_state and st.session_state["start"] == True:
             st.success("Running")
         else:
-            st.error("Stopped")        
+            st.error("Stopped")  
+        st.write('___')
 
-    col1, col2, col3, col4 = st.columns([1,1,1,2])
-    with col2:
+    col1,col11, col12, col13, col14, col2 = st.columns(6)
+        
+    with col1:
         if st.button('Stop'):
             st.session_state['start'] = False
             publish_status()
-    with col3:
-        st.button('Reset')
-        del st.session_state['data']
-        del st.session_state['start']
-       # seconds = 0
-        
-    with col4:
-         with st.spinner('Saving...'):
-                time.sleep(0.5)
-                
-                st.download_button(
-                    label="Download File",
-                    data= np.savetxt("dataSOM.txt", st.session_state['data'].values, fmt='%f', delimiter='\t'),
-                    file_name="dataSOM.txt",
-                    mime="text/plain"
-                )
-                st.success("Done!")
+    with col2:
+        rst = st.button('Reset')
+
+
+
 
     radio = st.sidebar.radio("Choose method",("Real-time Plot", "Data visualization","Features"))
+        
+    
+    with st.sidebar:
+        st.write('___')
+        csv = st.session_state['data'].to_csv(index=False).encode('utf-8')
+        save = st.download_button( label="Download", data = csv, file_name="dataSOM.csv"  )
+
+    if rst: 
+        del st.session_state['data']
+        del st.session_state['start']
+        st.warning("Data was deleted!")
+       # seconds = 0
+    
+    if save:
+        if 'data' not in st.session_state:
+            st.write("Please generate data")
+        else:
+            with st.sidebar:
+                with st.spinner('Saving...'):
+                        time.sleep(0.5)
+                        
+                        st.success("Done!")
+            
         
     if radio == "Real-time Plot" and 'start' in st.session_state:
         # Initialization
         if 'data' not in st.session_state and st.session_state['start'] == True:
             seconds = 0
-        
             df = pd.DataFrame({"data": []})
-            width = st.sidebar.slider("Plot width", 1, 20, 15)
-            height = st.sidebar.slider("Plot height", 1, 10, 5)
-            plot = st.line_chart(data=None,width=width,height=height)
+            plot = st.line_chart(data=None,width=15, height=5)
                
             while st.session_state['start'] == True:
                 point = pd.DataFrame({"data": [get_data()]})
@@ -159,7 +175,8 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         
     
     if radio == "Data visualization" and 'start' in st.session_state:
-         
+        st.write('___')
+        st.write("Filter data by choosing low-cut and high-cut frequency")
         #get filter parameters
         my_expander = st.expander('Band Pass filter')
         my_expander.write('Choose low-cut and high-cut frequencies:')
@@ -262,4 +279,7 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         st.pyplot(fig)
                     
 else:
-    st.write("Please generate a new file")
+    st.info("Please generate a new file")
+    with st.sidebar:
+        st.title("About")
+        st.info('This project was created as a data logger for recorded sounds that allows real-time visualization, analysis of the signal/features and to save the information to a file. All the source code can be found in https://github.com/sofernandes/cloud-logger')
