@@ -83,7 +83,7 @@ fs = 44100
 
 #read txt from a URL
 def get_data():
-    with open("dadosSOM.txt","r") as f:
+    with open("/workspace/cloud-logger/dadosSOM.txt","r") as f:
         last_line = f.readlines()[-1]
         return float(last_line[:-1])
 
