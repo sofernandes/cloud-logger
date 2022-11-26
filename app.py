@@ -178,6 +178,20 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         
     
     if radio == "Data visualization" and 'start' in st.session_state:
+        
+        with st.sidebar:
+            st.write('___')
+            expander = st.expander('Open file')
+     
+            expander.write('Press buttom to open file')
+            st.session_state["start"] = False
+    
+            uploaded_file = expander.file_uploader( label="Choose a file", type = "csv", help="Click the Search file button to open the csv file")
+            if uploaded_file is not None:
+                del st.session_state['data']
+                st.session_state['data'] = pd.read_csv(uploaded_file)
+                
+                    
         st.write('___')
         st.write("Filter data by choosing low-cut and high-cut frequency")
         #get filter parameters
@@ -285,4 +299,5 @@ else:
     st.info("Please generate a new file")
     with st.sidebar:
         st.title("About")
+        st.info("Welcome to Sound Aquisition Logger!")
         st.info('This project was created as a data logger for recorded sounds that allows real-time visualization, analysis of the signal/features and to save the information to a file. All the source code can be found in https://github.com/sofernandes/cloud-logger')
