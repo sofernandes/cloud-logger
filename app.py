@@ -5,7 +5,6 @@ import streamlit as st  # data web app development
 import matplotlib.pyplot as plt
 from pathlib import Path 
 from scipy.signal import butter, lfilter, find_peaks
-from scipy.misc import derivative
 import paho.mqtt.client as mqtt 
 from numpy.fft import fft
 
