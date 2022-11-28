@@ -7,9 +7,6 @@ from pathlib import Path
 from scipy.signal import butter, lfilter, find_peaks
 from scipy.misc import derivative
 import paho.mqtt.client as mqtt 
-import librosa
-import librosa.display
-import sklearn
 from numpy.fft import fft
 
 
@@ -251,6 +248,7 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
     
     if radio == "Features" and 'start' in st.session_state:
         y = st.session_state['data']['data'].to_numpy()
+        x = st.session_state['data'].index
         
         st.header("Feature extraction")
         
@@ -259,7 +257,7 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         col1, col2 = st.columns([1,1])
         with col1:
             #amplitude envelope
-            yd = derivative(y)
+            yd = np.diff(y)
             st.write("1º Derivada")
             fig, ax = plt.subplots(figsize=(10, 6)) 
             ax.set_xlabel("Time /s")
@@ -270,7 +268,7 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         with col2:
             st.write("2º Derivada")
             fig, ax = plt.subplots(figsize=(10, 6))
-            ydd = derivative(yd)
+            ydd = np.diff(yd)
             ax.set_xlabel("Time /s")
             ax.set_ylabel("Amplitude")
             ax.plot(ydd)
