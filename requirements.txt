@@ -1,11 +1,9 @@
 streamlit
 pandas
 numpy
-librosa
-librosa.display
-sklearn
+paho.mqtt.client
+pathlib
 matplotlib
 time
 pathlib
 scipy
-sklearn
