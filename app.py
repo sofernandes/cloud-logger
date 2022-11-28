@@ -290,7 +290,7 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         peaks, _ = find_peaks(y, height= np.max(y) * (threshold/100))
         t = np.arange(0, (idx+1)/10, 0.1)
         ax.plot(t, y)
-        ax.plot(peaks, y[peaks], 'o')
+        ax.plot(t[peaks], y[peaks], 'o')
         st.pyplot(fig)
 
         #histogram
@@ -303,9 +303,6 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         ax.stairs(counts,bins)
         st.pyplot(fig)
     
-        
-        #mean
-                    
 else:
     st.info("Please generate a new file")
     with st.sidebar:
