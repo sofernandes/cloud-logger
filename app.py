@@ -4,7 +4,8 @@ import pandas as pd  # read csv, df manipulation
 import streamlit as st  # data web app development
 import matplotlib.pyplot as plt
 from pathlib import Path 
-from scipy.signal import butter, lfilter
+from scipy.signal import butter, lfilter, find_peaks
+from scipy.misc import derivative
 import paho.mqtt.client as mqtt 
 import librosa
 import librosa.display
@@ -175,7 +176,19 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         is_check = st.checkbox("Display Data")
         if is_check:
             st.write(st.session_state['data'].T)
-        
+            
+            kpi1, kpi2, kpi3 = st.columns(3)
+    
+            #fill in those three columns with respective metrics or KPIs
+            kpi1.metric(
+                label="Maximum Power",
+                value=round(st.session_state['data'].max())
+            )
+
+            kpi2.metric(
+                label="Average Power",
+                value=round(st.session_state['data'].mean())
+            )
     
     if radio == "Data visualization" and 'start' in st.session_state:
         
@@ -246,54 +259,45 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         col1, col2 = st.columns([1,1])
         with col1:
             #amplitude envelope
-            y_harmonic, y_percussive = librosa.effects.hpss(y)
-            st.write("Componente harmónica")
+            yd = derivative(y)
+            st.write("1º Derivada")
             fig, ax = plt.subplots(figsize=(10, 6)) 
             ax.set_xlabel("Time /s")
             ax.set_ylabel("Amplitude")
-            ax.plot(y_harmonic)
+            ax.plot(yd)
             st.pyplot(fig)
         
         with col2:
-            st.write("Componente Percurssiva")
-            fig, ax = plt.subplots(figsize=(10, 6)) 
+            st.write("2º Derivada")
+            fig, ax = plt.subplots(figsize=(10, 6))
+            ydd = derivative(yd)
             ax.set_xlabel("Time /s")
             ax.set_ylabel("Amplitude")
-            ax.plot(y_percussive)
+            ax.plot(ydd)
             st.pyplot(fig)
         
-        #root mean square energy
-        
-        
-        
-        #zero-crossing rate
-    
-        
-        
-        st.subheader('Time-frequency domain')
 
-        #spectral centroid
-        st.write("Spectral Centroid")
-        spectral_centroids = librosa.feature.spectral_centroid(y, sr=fs)[0]
-        fig, ax = plt.subplots(figsize=(14, 4)) 
-        frames = range(len(spectral_centroids))
-        t = librosa.frames_to_time(frames)
-        # Normalising the spectral centroid for visualisation
-        def normalize(y, axis=0):
-            return sklearn.preprocessing.minmax_scale(y, axis=axis)
-        #Plotting the Spectral Centroid along the waveform
-        librosa.display.waveshow(y, sr=fs, alpha=0.4)
-        ax.plot(t, normalize(spectral_centroids), color='b')
+        #find peak
+        st.write("Find signal peaks")
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.set_xlabel("Time /s")
+        ax.set_ylabel("Amplitude")
+        peaks, _ = find_peaks(y, height= np.max(y) * 0.80)
+        ax.plot(y)
+        ax.plot(peaks, y[peaks], 'o')
+        st.pyplot(fig)
+
+        #histogram
+        st.write("Histogram")
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.set_xlabel("Time /s")
+        ax.set_ylabel("Amplitude")
+        counts, bins = np.histogram(y)
+        ax.stairs(counts,bins)
         st.pyplot(fig)
     
-        #chromagram
-        st.write("Chromagram")
-        chroma = librosa.feature.chroma_cqt(y=y, sr=fs)
-        fig, ax = plt.subplots(figsize=(14, 4)) 
-        img = librosa.display.specshow(chroma, y_axis='chroma', x_axis='time', ax=ax)
-        ax.set(title='Chromagram')
-        fig.colorbar(img, ax=ax)
-        st.pyplot(fig)
+        
+        #mean
                     
 else:
     st.info("Please generate a new file")
