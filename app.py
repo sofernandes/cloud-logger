@@ -89,10 +89,10 @@ def get_data():
         return float(last_line[:-1])
 
 
-st.markdown("<h1 style='text-align: center; color: white; padding:20px'>Sound Aquisition Logger</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: white; padding:20px'>Sound Acquisition Logger</h1>", unsafe_allow_html=True)
 st.write('___')
 
-start = st.button("Start Aquisition")
+start = st.button("Start Acquisition")
 if start:
     st.session_state['start'] = True
     publish_status()    
@@ -299,5 +299,5 @@ else:
     st.info("Please generate a new file")
     with st.sidebar:
         st.title("About")
-        st.info("Welcome to Sound Aquisition Logger!")
+        st.info("Welcome to Sound Acquisition Logger!")
         st.info('This project was created as a data logger for recorded sounds that allows real-time visualization, analysis of the signal/features and to save the information to a file. All the source code can be found in https://github.com/sofernandes/cloud-logger')
