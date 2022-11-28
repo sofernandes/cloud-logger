@@ -216,7 +216,7 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
 
         y = butter_bandpass_filter(st.session_state['data']['data'], lowcut, highcut, fs)
         idx = (st.session_state['data']['data']).index[-1]
-        t = np.arange(0, idx[-1]/10, 0.1)
+        t = np.arange(0, idx/10, 0.1)
         
         if len(show) == 1:
             if show[0] == 'Sonogram':
@@ -251,7 +251,7 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
     if radio == "Features" and 'start' in st.session_state:
         y = st.session_state['data']['data'].to_numpy()
         idx = (st.session_state['data']['data']).index[-1]
-        t = np.arange(0, idx[-1]/10, 0.1)
+        t = np.arange(0, idx/10, 0.1)
         st.header("Feature extraction")
         
         st.subheader("Time domain")
