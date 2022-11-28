@@ -215,7 +215,8 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         show = st.multiselect("Select plot", ['Sonogram','Spectrogram','Frequency Domain'], ['Sonogram'])
 
         y = butter_bandpass_filter(st.session_state['data']['data'], lowcut, highcut, fs)
-        t = np.arange(0, pd.Index(st.session_state['data']['data']).max()/10, 0.1)
+        idx = pd.Index(st.session_state['data']['data'])
+        t = np.arange(0, idx.max()/10, 0.1)
         
         if len(show) == 1:
             if show[0] == 'Sonogram':
@@ -249,8 +250,8 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
     
     if radio == "Features" and 'start' in st.session_state:
         y = st.session_state['data']['data'].to_numpy()
-        st.write(pd.Index(st.session_state['data']['data']).max()/10) 
-        t = np.arange(0, pd.Index(st.session_state['data']['data']).max()/10, 0.1)
+        idx = pd.Index(st.session_state['data']['data'])
+        t = np.arange(0, idx.max()/10, 0.1)
         st.write(t)
         st.header("Feature extraction")
         
