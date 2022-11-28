@@ -16,13 +16,13 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
     return y
 
 
-def plot_senogram(y):
+def plot_senogram(y, t):
     fig, ax = plt.subplots(figsize=(14, 4)) 
     st.write('Sonogram plot')
     ax.set_xlabel("Time /s")
     ax.set_ylabel("Data")
     ax.set_title("Sonogram plot", fontsize = 15)
-    ax.plot(y)
+    ax.plot(t,y)
     plt.show()
     st.pyplot(fig) 
 
@@ -215,10 +215,11 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         show = st.multiselect("Select plot", ['Sonogram','Spectrogram','Frequency Domain'], ['Sonogram'])
 
         y = butter_bandpass_filter(st.session_state['data']['data'], lowcut, highcut, fs)
+        t = np.arange(0, y.Index.max, 0.1)
         
         if len(show) == 1:
             if show[0] == 'Sonogram':
-                 plot_senogram(y)
+                 plot_senogram(y,t)
             
             if show[0] == 'Spectrogram':
                 plot_spetrogram(y, fs)
@@ -228,11 +229,11 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         
         if len(show) == 2:
             if 'Sonogram' in show and 'Spectrogram' in show:
-                 plot_senogram(y)
+                 plot_senogram(y,t)
                  plot_spetrogram(y, fs)
                  
             if 'Sonogram' in show and 'Frequency Domain' in show:
-                plot_senogram(y)
+                plot_senogram(y,t)
                 plot_fft(y, fs)   
                 
             if 'Spectrogram' in show and 'Frequency Domain' in show:
@@ -240,7 +241,7 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
                 plot_fft(y, fs)   
             
         if len(show) == 3:
-            plot_senogram(y)
+            plot_senogram(y,t)
             plot_fft(y, fs) 
             plot_spetrogram(y, fs)
 
@@ -248,7 +249,7 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
     
     if radio == "Features" and 'start' in st.session_state:
         y = st.session_state['data']['data'].to_numpy()
-        x = st.session_state['data'].index
+        t = np.arange(0, y.Index.max, 0.1)
         
         st.header("Feature extraction")
         
@@ -260,36 +261,41 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
             yd = np.diff(y)
             st.write("1º Derivada")
             fig, ax = plt.subplots(figsize=(10, 6)) 
+            ax.set_title("Ist derivative", fontsize = 15)
             ax.set_xlabel("Time /s")
             ax.set_ylabel("Amplitude")
-            ax.plot(yd)
+            ax.plot(t, yd)
             st.pyplot(fig)
         
         with col2:
             st.write("2º Derivada")
             fig, ax = plt.subplots(figsize=(10, 6))
+            ax.set_title("2º derivative", fontsize = 15)
             ydd = np.diff(yd)
             ax.set_xlabel("Time /s")
             ax.set_ylabel("Amplitude")
-            ax.plot(ydd)
+            ax.plot(t, ydd)
             st.pyplot(fig)
         
 
         #find peak
         st.write("Find signal peaks")
+        threshold = st.slider("Threshold", 0, 100, 80)
         fig, ax = plt.subplots(figsize=(10, 6))
+        ax.set_title("Amplitude peaks in rms signal", fontsize = 15)
         ax.set_xlabel("Time /s")
         ax.set_ylabel("Amplitude")
-        peaks, _ = find_peaks(y, height= np.max(y) * 0.80)
-        ax.plot(y)
+        peaks, _ = find_peaks(y, height= np.max(y) * (threshold/100))
+        ax.plot(t, y)
         ax.plot(peaks, y[peaks], 'o')
         st.pyplot(fig)
 
         #histogram
         st.write("Histogram")
         fig, ax = plt.subplots(figsize=(10, 6))
-        ax.set_xlabel("Time /s")
-        ax.set_ylabel("Amplitude")
+        ax.set_title("Histogram plot", fontsize = 15)
+        ax.set_xlabel("Counts")
+        ax.set_ylabel("Bins")
         counts, bins = np.histogram(y)
         ax.stairs(counts,bins)
         st.pyplot(fig)
