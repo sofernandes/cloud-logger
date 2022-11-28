@@ -249,7 +249,7 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
     
     if radio == "Features" and 'start' in st.session_state:
         y = st.session_state['data']['data'].to_numpy()
-        t = np.arange(0, y.Index.max, 0.1)
+        t = np.arange(0, y.size, 0.1)
         
         st.header("Feature extraction")
         
