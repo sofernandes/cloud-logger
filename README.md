@@ -1,5 +1,5 @@
 # cloud-logger
-Instrumentation Cloud Logger made for the UC AAIB in 2022/2023. 
+Instrumentation Cloud Logger made for the UC AAIB (Nova School of Science and Technology) in 2022/2023. 
 
 An interface was developed with streamlit where the user can control signal acquistion flow (start and stop). For this, Streamlit will connect to MQTT Broker to send a "Status" message that the publisherSOM.py file will recieve and react accordingly.
 
