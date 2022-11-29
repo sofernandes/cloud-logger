@@ -174,8 +174,7 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
             st.write(st.session_state['data'].T)
             
             kpi1, kpi2, kpi3 = st.columns(3)
-    
-            #fill in those three columns with respective metrics or KPIs
+
             kpi1.metric(
                 label="Maximum Power",
                 value=round(st.session_state['data'].max())
@@ -253,24 +252,22 @@ if my_file.is_file() and 'start' in st.session_state: #if file exists
         t = np.arange(0, idx/10, 0.1)
         st.header("Feature extraction")
         
-        st.subheader("Time domain")
-        
         col1, col2 = st.columns([1,1])
         with col1:
             #amplitude envelope
             yd = np.diff(y)
-            st.write("1º Derivada")
+            st.write("1st derivative")
             fig, ax = plt.subplots(figsize=(10, 6)) 
-            ax.set_title("Ist derivative", fontsize = 15)
+            ax.set_title("1st derivative", fontsize = 15)
             ax.set_xlabel("Time /s")
             ax.set_ylabel("Amplitude")
             ax.plot(t, yd)
             st.pyplot(fig)
         
         with col2:
-            st.write("2º Derivada")
+            st.write("2nd derivative")
             fig, ax = plt.subplots(figsize=(10, 6))
-            ax.set_title("2º derivative", fontsize = 15)
+            ax.set_title("2nd derivative", fontsize = 15)
             ydd = np.diff(yd)
             ax.set_xlabel("Time /s")
             ax.set_ylabel("Amplitude")
